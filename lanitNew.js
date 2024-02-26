@@ -50,15 +50,44 @@ let dIsPressed = false;
 let wIsPressed = false;
 
 
+let speed = 5;
+const radius = 20;
+let x = 500;
+let y = 500;
+
+
 function updateGame() {
     if (aIsPressed) {
-        console.log("true");
+        x -= speed;
+    }
+
+    if (dIsPressed) {
+        x += speed;
+    }
+
+    if (sIsPressed) {
+        y += speed;
+    }
+
+    if (wIsPressed) {
+        y -= speed;
     }
 }
 
 
-function renderGame() {}
+function renderPlayer(x, y) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = "black";
+        ctx.fill();
+        ctx.closePath();
+}
 
+
+function renderGame() {
+    renderPlayer(x, y);
+}
 
 
 
@@ -69,7 +98,6 @@ function gameLoop() {
     renderGame();
 
     requestAnimationFrame(gameLoop);
-
 }
 
 
