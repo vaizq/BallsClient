@@ -4,54 +4,75 @@ const ctx = canvas.getContext("2d");
 
 function keyDownHandler(event) {
     if (event.key === "d") {
-        dPressed = true;
+        dIsPressed = true;
     }
 
     if (event.key === "a") {
-        aPressed = true;
+        aIsPressed = true;
     }
 
     if (event.key === "w") {
-        wPressed = true;
+        wIsPressed = true;
     }
 
     if (event.key === "s") {
-        sPressed = true;
+        sIsPressed = true;
     }
 }
+
 
 function keyUpHandler(event) {
     if (event.key === "d") {
-        dPressed = false;
+        dIsPressed = false;
     }
 
     if (event.key === "a") {
-        aPressed = false;
+        aIsPressed = false;
     }
 
     if (event.key === "w") {
-        wPressed = false;
+        wIsPressed = false;
     }
 
     if (event.key === "s") {
-        sPressed = false;
+        sIsPressed = false;
     }
 }
+
 
 document.addEventListener("keydown", keyDownHandler);
 document.addEventListener("keyup", keyUpHandler);
 
 
-let aPressed = false;
-let sPressed = false;
-let dPressed = false;
-let wPressed = false;
+let aIsPressed = false;
+let sIsPressed = false;
+let dIsPressed = false;
+let wIsPressed = false;
+
+
+function updateGame() {
+    if (aIsPressed) {
+        console.log("true");
+    }
+}
+
+
+function renderGame() {}
+
+
 
 
 function gameLoop() {
 
+    updateGame();
+
+    renderGame();
+
+    requestAnimationFrame(gameLoop);
 
 }
 
 
 gameLoop();
+
+
