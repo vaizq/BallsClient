@@ -2,6 +2,22 @@ const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 
 
+let aIsPressed = false;
+let sIsPressed = false;
+let dIsPressed = false;
+let wIsPressed = false;
+
+
+let speed = 5;
+const radius = 20;
+let x = 500;
+let y = 500;
+
+
+document.addEventListener("keydown", keyDownHandler);
+document.addEventListener("keyup", keyUpHandler);
+
+
 function keyDownHandler(event) {
     if (event.key === "d") {
         dIsPressed = true;
@@ -38,22 +54,6 @@ function keyUpHandler(event) {
         sIsPressed = false;
     }
 }
-
-
-document.addEventListener("keydown", keyDownHandler);
-document.addEventListener("keyup", keyUpHandler);
-
-
-let aIsPressed = false;
-let sIsPressed = false;
-let dIsPressed = false;
-let wIsPressed = false;
-
-
-let speed = 5;
-const radius = 20;
-let x = 500;
-let y = 500;
 
 
 function updateGame() {
