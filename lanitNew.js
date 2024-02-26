@@ -1,3 +1,5 @@
+import { netGetEnemies, netSetMyPlayer} from "./net.js";
+
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 
@@ -56,39 +58,70 @@ function keyUpHandler(event) {
 }
 
 
-function updateGame() {
-    if (aIsPressed) {
-        x -= speed;
-    }
+<<<<<<< HEAD
+=======
+document.addEventListener("keydown", keyDownHandler);
+document.addEventListener("keyup", keyUpHandler);
 
-    if (dIsPressed) {
-        x += speed;
-    }
 
-    if (sIsPressed) {
-        y += speed;
-    }
+let aIsPressed = false;
+let sIsPressed = false;
+let dIsPressed = false;
+let wIsPressed = false;
 
-    if (wIsPressed) {
-        y -= speed;
-    }
+
+let speed = 5;
+const radius = 20;
+let myPlayer = {
+    id: 0,
+    x: 500,
+    y: 500,
 }
 
 
-function renderPlayer(x, y) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+>>>>>>> 4f2a212defb898ac542e739e8d863285e8d45cef
+function updateGame() {
+    if (aIsPressed) {
+        myPlayer.x -= speed;
+    }
+
+    if (dIsPressed) {
+        myPlayer.x += speed;
+    }
+
+    if (sIsPressed) {
+        myPlayer.y += speed;
+    }
+
+    if (wIsPressed) {
+        myPlayer.y -= speed;
+    }
+
+    netSetMyPlayer(myPlayer);
+}
+
+
+function renderPlayer(x, y, color) {
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = "black";
+        ctx.fillStyle = color;
         ctx.fill();
         ctx.closePath();
 }
 
 
 function renderGame() {
-    renderPlayer(x, y);
-}
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    renderPlayer(myPlayer.x, myPlayer.y, "blue");
+
+    // render enemies
+    netGetEnemies().forEach((value, key) => {
+        const x = value['x'];
+        const y = value['y'];
+        renderPlayer(x, y, "black");
+    });
+}
 
 
 function gameLoop() {
