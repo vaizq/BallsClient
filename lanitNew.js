@@ -1,3 +1,5 @@
+import { netGetEnemies, netSetMyPlayer} from "./net.js";
+
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 
@@ -52,43 +54,55 @@ let wIsPressed = false;
 
 let speed = 5;
 const radius = 20;
-let x = 500;
-let y = 500;
+let myPlayer = {
+    id: 0,
+    x: 500,
+    y: 500,
+}
 
 
 function updateGame() {
     if (aIsPressed) {
-        x -= speed;
+        myPlayer.x -= speed;
     }
 
     if (dIsPressed) {
-        x += speed;
+        myPlayer.x += speed;
     }
 
     if (sIsPressed) {
-        y += speed;
+        myPlayer.y += speed;
     }
 
     if (wIsPressed) {
-        y -= speed;
+        myPlayer.y -= speed;
     }
+
+    netSetMyPlayer(myPlayer);
 }
 
 
-function renderPlayer(x, y) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+function renderPlayer(x, y, color) {
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = "black";
+        ctx.fillStyle = color;
         ctx.fill();
         ctx.closePath();
 }
 
 
 function renderGame() {
-    renderPlayer(x, y);
-}
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    renderPlayer(myPlayer.x, myPlayer.y, "blue");
+
+    // render enemies
+    netGetEnemies().forEach((value, key) => {
+        const x = value['x'];
+        const y = value['y'];
+        renderPlayer(x, y, "black");
+    });
+}
 
 
 function gameLoop() {
