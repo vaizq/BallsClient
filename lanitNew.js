@@ -53,10 +53,17 @@ function mouseMoveHandler(event) {
     */
 }
 
+function mouseDownHandler(event) {
+    if (event.key === 0) {
+        
+    }
+}
+
 
 document.addEventListener("keydown", keyDownHandler);
 document.addEventListener("keyup", keyUpHandler);
 document.addEventListener("mousemove", mouseMoveHandler);
+document.addEventListener("mousedown", mouseDownHandler);
 
 
 let aIsPressed = false;
@@ -66,7 +73,7 @@ let wIsPressed = false;
 
 
 let speed = 100;
-const radius = 20;
+const radius = 100;
 let myPlayer = {
     id: 0,
     x: 500,
@@ -75,13 +82,12 @@ let myPlayer = {
     veloY: 0
 }
 
+
 const imgWidth = 250;
 const imgHeight = 250;
 
 
-function updateGame() {
-    const dt = 1.0 / 60; // deltaTime: Time how long each frame takes in secods 
-
+function updateVelocity(dt) {
     if (aIsPressed) {
         myPlayer.veloX = -speed;
     }
@@ -105,31 +111,49 @@ function updateGame() {
     myPlayer.x += myPlayer.veloX * dt;
     myPlayer.y += myPlayer.veloY * dt;
 
+}
 
+function handleCollisions(entity) {
     //added bounds.
-    /*
-    if (myPlayer.x - radius < 0) {
-        myPlayer.x = radius;
+    if (entity.x - radius < 0) {
+        entity.x = radius;
     }
 
-    if (myPlayer.x + radius > 1920) {
-        myPlayer.x = 1920 - radius;
+    if (entity.x + radius > canvas.width) {
+        entity.x = canvas.width - radius;
     }
 
-    if (myPlayer.y - radius < 0) {
-        myPlayer.y = radius;
+    if (entity.y - radius < 0) {
+        entity.y = radius;
     }
 
-    if (myPlayer.y + radius > 1080) {
-        myPlayer.y = 1080 - radius;
+    if (entity.y + radius > canvas.height) {
+        entity.y = canvas.height - radius;
     }
-    */
+}
+
+
+function updateGame() {
+    const dt = 1.0 / 60; // deltaTime: Time how long each frame takes in secods 
+
+    updateVelocity(dt);
+
+    handleCollisions(myPlayer);
 
     netSetMyPlayer(myPlayer);
 }
 
+function drawCircle(x, y, r) {
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 2 * Math.PI, false);
+    ctx.fillStyle = "red";
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'red';
+    ctx.stroke();
+}
 
 function renderEntity(x, y, sprite) {
+    drawCircle(x, y, radius);
     ctx.drawImage(sprite, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
 }
 
