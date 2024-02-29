@@ -1,23 +1,6 @@
-import { netGetEnemies, netSetMyPlayer} from "./net.js";
-
+//import { netGetEnemies, netSetMyPlayer} from "./net.js";
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
-
-
-let aIsPressed = false;
-let sIsPressed = false;
-let dIsPressed = false;
-let wIsPressed = false;
-
-
-let speed = 5;
-const radius = 20;
-let x = 500;
-let y = 500;
-
-
-document.addEventListener("keydown", keyDownHandler);
-document.addEventListener("keyup", keyUpHandler);
 
 
 function keyDownHandler(event) {
@@ -58,10 +41,16 @@ function keyUpHandler(event) {
 }
 
 
-<<<<<<< HEAD
-=======
+function mouseMoveHandler(event) {
+    const rect = canvas.getBoundingClientRect();
+    let mouseX = event.clientX - rect.left - elementWidth / 2;
+    let mouseY = event.clientY - rect.top - elementHeight / 2;
+}
+
+
 document.addEventListener("keydown", keyDownHandler);
 document.addEventListener("keyup", keyUpHandler);
+document.addEventListener("mousemove", mouseMoveHandler);
 
 
 let aIsPressed = false;
@@ -69,17 +58,19 @@ let sIsPressed = false;
 let dIsPressed = false;
 let wIsPressed = false;
 
-
 let speed = 5;
-const radius = 20;
+const radius = 45;
+
 let myPlayer = {
     id: 0,
     x: 500,
     y: 500,
 }
 
+const imgHeight = 250;
+const imgWidth = 250;
 
->>>>>>> 4f2a212defb898ac542e739e8d863285e8d45cef
+
 function updateGame() {
     if (aIsPressed) {
         myPlayer.x -= speed;
@@ -97,23 +88,52 @@ function updateGame() {
         myPlayer.y -= speed;
     }
 
-    netSetMyPlayer(myPlayer);
+
+    //added bounds.
+    if (myPlayer.x - radius < 0) {
+        myPlayer.x = radius;
+    }
+
+    if (myPlayer.x + radius > 1920) {
+        myPlayer.x = 1920 - radius;
+    }
+
+    if (myPlayer.y - radius < 0) {
+        myPlayer.y = radius;
+    }
+
+    if (myPlayer.y + radius > 1080) {
+        myPlayer.y = 1080 - radius;
+    }
+
+    //netSetMyPlayer(myPlayer);
 }
 
 
-function renderPlayer(x, y, color) {
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.closePath();
+function renderPlayer(x, y) {
+    const playerImg = document.getElementById("player-avatar");
+    ctx.drawImage(playerImg, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
+}
+
+
+function renderEnemy() {
+    const enemyImg = document.getElementById("enemy-avatar");
+
+    netGetEnemies().forEach((value, key) => {
+        const x = value['x'];
+        const y = value['y'];
+
+    ctx.drawImage(enemyImg, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
+    });
 }
 
 
 function renderGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    renderPlayer(myPlayer.x, myPlayer.y, "blue");
+    renderPlayer(myPlayer.x, myPlayer.y);
+
+    renderEnemy();
 
     // render enemies
     netGetEnemies().forEach((value, key) => {

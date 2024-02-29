@@ -1,5 +1,5 @@
 
-const socket = new WebSocket('ws://localhost:6969');
+const socket = new WebSocket('ws://192.168.0.12:6969');
 
 
 let myPlayer = {};
@@ -26,7 +26,7 @@ function handleInfoMessage(msg) {
     myPlayer.y = msg['y'];
 
     // Start sending playerUpdates
-    timerID = setInterval(sendPlayerUpdate, 100);
+    timerID = setInterval(sendPlayerUpdate, 20);
 }
 
 function handleWorldUpdate(msg) {
