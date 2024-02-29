@@ -1,4 +1,5 @@
-import { netGetEnemies, netSetMyPlayer} from "./net.js";
+import { netGetEnemies, netSetMyPlayer, netDeltaTimeFromLastUpdate} from "./net.js";
+
 
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
@@ -52,31 +53,42 @@ let dIsPressed = false;
 let wIsPressed = false;
 
 
-let speed = 5;
+let speed = 100;
 const radius = 20;
 let myPlayer = {
     id: 0,
     x: 500,
     y: 500,
+    veloX: 0,
+    veloY: 0
 }
 
 
 function updateGame() {
-    if (aIsPressed) {
-        myPlayer.x -= speed;
-    }
+    const dt = 1.0 / 60; // deltaTime: Time how long each frame takes in secods 
 
-    if (dIsPressed) {
-        myPlayer.x += speed;
+    if (aIsPressed) {
+        myPlayer.veloX = -speed;
+    }
+    else if (dIsPressed) {
+        myPlayer.veloX = speed;
+    }
+    else {
+        myPlayer.veloX = 0;
     }
 
     if (sIsPressed) {
-        myPlayer.y += speed;
+        myPlayer.veloY = speed;
+    }
+    else if (wIsPressed) {
+        myPlayer.veloY = -speed;
+    }
+    else {
+        myPlayer.veloY = 0;
     }
 
-    if (wIsPressed) {
-        myPlayer.y -= speed;
-    }
+    myPlayer.x += myPlayer.veloX * dt;
+    myPlayer.y += myPlayer.veloY * dt;
 
     netSetMyPlayer(myPlayer);
 }
@@ -97,24 +109,20 @@ function renderGame() {
     renderPlayer(myPlayer.x, myPlayer.y, "blue");
 
     // render enemies
-    netGetEnemies().forEach((value, key) => {
-        const x = value['x'];
-        const y = value['y'];
+    netGetEnemies().forEach((enemy, key) => {
+        const dt = netDeltaTimeFromLastUpdate();
+        const x = enemy['x'] + enemy['veloX'] * dt;
+        const y = enemy['y'] + enemy['veloY'] * dt;
         renderPlayer(x, y, "black");
     });
 }
 
 
 function gameLoop() {
-
     updateGame();
-
     renderGame();
-
     requestAnimationFrame(gameLoop);
 }
 
 
 gameLoop();
-
-

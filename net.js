@@ -1,10 +1,10 @@
-
-const socket = new WebSocket('ws://localhost:6969');
+const socket = new WebSocket('ws://192.168.1.18:6969');
 
 
 let myPlayer = {};
 let enemies = new Map();
 let timerID = 0;
+let updateTime = Date.now();
 
 
 export function netSetMyPlayer(player) {
@@ -15,18 +15,29 @@ export function netGetEnemies() {
     return enemies;
 }
 
+export function netDeltaTimeFromLastUpdate() {
+    return (Date.now() - updateTime) / 1000.0;
+}
+
 function sendPlayerUpdate() {
     console.log("Send player update");
     socket.send(JSON.stringify(myPlayer));
+}
+
+// Send actions to server such as {type: "action", action: "shoot", x: 0, y: 0, veloX: 1, veloY: 1}
+function sendAction(action) {
+    socket.send(JSON.stringify(action));
 }
 
 function handleInfoMessage(msg) {
     myPlayer.id = msg['id'];
     myPlayer.x = msg['x'];
     myPlayer.y = msg['y'];
+    myPlayer.veloX = msg['veloX'];
+    myPlayer.veloY = msg['veloY'];
 
     // Start sending playerUpdates
-    timerID = setInterval(sendPlayerUpdate, 100);
+    timerID = setInterval(sendPlayerUpdate, 20);
 }
 
 function handleWorldUpdate(msg) {
@@ -37,6 +48,7 @@ function handleWorldUpdate(msg) {
             enemies.set(player['id'], player);
         }
     });
+    updateTime = Date.now();
 }
 
 socket.addEventListener('open', (event) => {
