@@ -1,12 +1,10 @@
-<<<<<<< HEAD
 import { netGetEnemies, netSetMyPlayer, netDeltaTimeFromLastUpdate} from "./net.js";
 
 
-=======
-//import { netGetEnemies, netSetMyPlayer} from "./net.js";
->>>>>>> 20ba10837240c9aab2dd1891529554381acad200
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
+const playerSprite = document.getElementById("player-avatar");
+const enemySprite = document.getElementById("enemy-avatar");
 
 
 function keyDownHandler(event) {
@@ -64,15 +62,9 @@ let sIsPressed = false;
 let dIsPressed = false;
 let wIsPressed = false;
 
-<<<<<<< HEAD
 
 let speed = 100;
 const radius = 20;
-=======
-let speed = 5;
-const radius = 45;
-
->>>>>>> 20ba10837240c9aab2dd1891529554381acad200
 let myPlayer = {
     id: 0,
     x: 500,
@@ -81,8 +73,8 @@ let myPlayer = {
     veloY: 0
 }
 
-const imgHeight = 250;
 const imgWidth = 250;
+const imgHeight = 250;
 
 
 function updateGame() {
@@ -129,41 +121,28 @@ function updateGame() {
         myPlayer.y = 1080 - radius;
     }
 
-    //netSetMyPlayer(myPlayer);
+    netSetMyPlayer(myPlayer);
 }
 
 
-function renderPlayer(x, y) {
-    const playerImg = document.getElementById("player-avatar");
-    ctx.drawImage(playerImg, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
-}
-
-
-function renderEnemy() {
-    const enemyImg = document.getElementById("enemy-avatar");
-
-    netGetEnemies().forEach((value, key) => {
-        const x = value['x'];
-        const y = value['y'];
-
-    ctx.drawImage(enemyImg, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
-    });
+function renderEntity(x, y, sprite) {
+    ctx.drawImage(sprite, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
 }
 
 
 function renderGame() {
+    // clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    renderPlayer(myPlayer.x, myPlayer.y);
-
-    renderEnemy();
+    // render player
+    renderEntity(myPlayer.x, myPlayer.y, playerSprite);
 
     // render enemies
     netGetEnemies().forEach((enemy, key) => {
         const dt = netDeltaTimeFromLastUpdate();
         const x = enemy['x'] + enemy['veloX'] * dt;
         const y = enemy['y'] + enemy['veloY'] * dt;
-        renderPlayer(x, y, "black");
+        renderEntity(x, y, enemySprite);
     });
 }
 
