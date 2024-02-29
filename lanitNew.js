@@ -46,9 +46,11 @@ function keyUpHandler(event) {
 
 
 function mouseMoveHandler(event) {
+    /*
     const rect = canvas.getBoundingClientRect();
     let mouseX = event.clientX - rect.left - elementWidth / 2;
     let mouseY = event.clientY - rect.top - elementHeight / 2;
+    */
 }
 
 
@@ -105,6 +107,7 @@ function updateGame() {
 
 
     //added bounds.
+    /*
     if (myPlayer.x - radius < 0) {
         myPlayer.x = radius;
     }
@@ -120,6 +123,7 @@ function updateGame() {
     if (myPlayer.y + radius > 1080) {
         myPlayer.y = 1080 - radius;
     }
+    */
 
     netSetMyPlayer(myPlayer);
 }

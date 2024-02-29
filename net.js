@@ -16,7 +16,10 @@ export function netGetEnemies() {
 }
 
 export function netDeltaTimeFromLastUpdate() {
-    return (Date.now() - updateTime) / 1000.0;
+    const now = Date.now();
+    const dt = (now - updateTime) / 1000.0;
+    updateTime = now;
+    return dt;
 }
 
 function sendPlayerUpdate() {
