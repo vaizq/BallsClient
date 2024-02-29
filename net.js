@@ -23,12 +23,17 @@ export function netDeltaTimeFromLastUpdate() {
 }
 
 function sendPlayerUpdate() {
-    console.log("Send player update");
-    socket.send(JSON.stringify(myPlayer));
+    let str = JSON.stringify(myPlayer);
+    let msg = JSON.parse(str);
+    msg['type'] = 'PlayerUpdate';
+    socket.send(JSON.stringify(msg));
 }
 
-// Send actions to server such as {type: "action", action: "shoot", x: 0, y: 0, veloX: 1, veloY: 1}
-function sendAction(action) {
+// Send actions to server such as 
+// {type: "action", action: "shot", playerID: 123, x: 0, y: 0, directionX: 69, directionY: 420}
+//
+export function netSendAction(action) {
+    action['type'] = 'action';
     socket.send(JSON.stringify(action));
 }
 
@@ -59,8 +64,6 @@ socket.addEventListener('open', (event) => {
 });
 
 socket.addEventListener('message', (event) => {
-
-    console.log(`Got message: ${event.data}`);
 
     try {
         const msg = JSON.parse(event.data);

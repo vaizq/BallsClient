@@ -1,10 +1,27 @@
-import { netGetEnemies, netSetMyPlayer, netDeltaTimeFromLastUpdate} from "./net.js";
+import { netGetEnemies, netSetMyPlayer, netDeltaTimeFromLastUpdate, netSendAction} from "./net.js";
 
 
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 const playerSprite = document.getElementById("player-avatar");
 const enemySprite = document.getElementById("enemy-avatar");
+const shotgunBlastAudio = new Audio('shotgun-blast-cut.mp3');
+const shotgunReloadAudio = new Audio('shotgun-reload.mp3');
+
+
+function playAudio(audio) {
+    return new Promise((resolve, reject) => {
+        audio.addEventListener('ended', () => {
+          resolve();
+        });
+
+        audio.addEventListener('error', (error) => {
+          reject(error);
+        });
+
+        audio.play();
+      });
+}
 
 
 function keyDownHandler(event) {
@@ -44,7 +61,6 @@ function keyUpHandler(event) {
     }
 }
 
-
 function mouseMoveHandler(event) {
     /*
     const rect = canvas.getBoundingClientRect();
@@ -54,9 +70,8 @@ function mouseMoveHandler(event) {
 }
 
 function mouseDownHandler(event) {
-    if (event.key === 0) {
-        
-    }
+    console.log("Shoot!");
+    shoot();        
 }
 
 
@@ -73,19 +88,47 @@ let wIsPressed = false;
 
 
 let speed = 100;
-const radius = 100;
+const radius = 50;
 let myPlayer = {
     id: 0,
     x: 500,
     y: 500,
     veloX: 0,
-    veloY: 0
+    veloY: 0,
+    canShoot: true
 }
 
+let crosshair = {
+    x: 0,
+    y: 0
+}
 
 const imgWidth = 250;
 const imgHeight = 250;
 
+
+function shoot() {
+    if (myPlayer.canShoot) {
+        myPlayer.canShoot = false;
+
+        playAudio(shotgunBlastAudio)
+        .then(() => playAudio(shotgunReloadAudio))
+        .then(() => {
+            myPlayer.canShoot = true;
+        });
+
+        const shotAction = {
+            action: 'shot',
+            playerID: myPlayer.id,
+            x: myPlayer.x,
+            y: myPlayer.y,
+            directionX: crosshair.x - myPlayer.x,
+            directionY: crosshair.y - myPlayer.y
+        };
+
+        netSendAction(shotAction);
+    }
+}
 
 function updateVelocity(dt) {
     if (aIsPressed) {
@@ -110,7 +153,6 @@ function updateVelocity(dt) {
 
     myPlayer.x += myPlayer.veloX * dt;
     myPlayer.y += myPlayer.veloY * dt;
-
 }
 
 function handleCollisions(entity) {
@@ -131,7 +173,6 @@ function handleCollisions(entity) {
         entity.y = canvas.height - radius;
     }
 }
-
 
 function updateGame() {
     const dt = 1.0 / 60; // deltaTime: Time how long each frame takes in secods 
