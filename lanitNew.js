@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 import { netGetEnemies, netSetMyPlayer, netDeltaTimeFromLastUpdate} from "./net.js";
 
 
+=======
+//import { netGetEnemies, netSetMyPlayer} from "./net.js";
+>>>>>>> 20ba10837240c9aab2dd1891529554381acad200
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 
@@ -43,8 +47,16 @@ function keyUpHandler(event) {
 }
 
 
+function mouseMoveHandler(event) {
+    const rect = canvas.getBoundingClientRect();
+    let mouseX = event.clientX - rect.left - elementWidth / 2;
+    let mouseY = event.clientY - rect.top - elementHeight / 2;
+}
+
+
 document.addEventListener("keydown", keyDownHandler);
 document.addEventListener("keyup", keyUpHandler);
+document.addEventListener("mousemove", mouseMoveHandler);
 
 
 let aIsPressed = false;
@@ -52,9 +64,15 @@ let sIsPressed = false;
 let dIsPressed = false;
 let wIsPressed = false;
 
+<<<<<<< HEAD
 
 let speed = 100;
 const radius = 20;
+=======
+let speed = 5;
+const radius = 45;
+
+>>>>>>> 20ba10837240c9aab2dd1891529554381acad200
 let myPlayer = {
     id: 0,
     x: 500,
@@ -62,6 +80,9 @@ let myPlayer = {
     veloX: 0,
     veloY: 0
 }
+
+const imgHeight = 250;
+const imgWidth = 250;
 
 
 function updateGame() {
@@ -90,23 +111,52 @@ function updateGame() {
     myPlayer.x += myPlayer.veloX * dt;
     myPlayer.y += myPlayer.veloY * dt;
 
-    netSetMyPlayer(myPlayer);
+
+    //added bounds.
+    if (myPlayer.x - radius < 0) {
+        myPlayer.x = radius;
+    }
+
+    if (myPlayer.x + radius > 1920) {
+        myPlayer.x = 1920 - radius;
+    }
+
+    if (myPlayer.y - radius < 0) {
+        myPlayer.y = radius;
+    }
+
+    if (myPlayer.y + radius > 1080) {
+        myPlayer.y = 1080 - radius;
+    }
+
+    //netSetMyPlayer(myPlayer);
 }
 
 
-function renderPlayer(x, y, color) {
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.closePath();
+function renderPlayer(x, y) {
+    const playerImg = document.getElementById("player-avatar");
+    ctx.drawImage(playerImg, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
+}
+
+
+function renderEnemy() {
+    const enemyImg = document.getElementById("enemy-avatar");
+
+    netGetEnemies().forEach((value, key) => {
+        const x = value['x'];
+        const y = value['y'];
+
+    ctx.drawImage(enemyImg, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
+    });
 }
 
 
 function renderGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    renderPlayer(myPlayer.x, myPlayer.y, "blue");
+    renderPlayer(myPlayer.x, myPlayer.y);
+
+    renderEnemy();
 
     // render enemies
     netGetEnemies().forEach((enemy, key) => {
