@@ -74,7 +74,6 @@ function mouseDownHandler(event) {
     shoot();        
 }
 
-
 document.addEventListener("keydown", keyDownHandler);
 document.addEventListener("keyup", keyUpHandler);
 document.addEventListener("mousemove", mouseMoveHandler);
@@ -89,13 +88,16 @@ let wIsPressed = false;
 
 let speed = 100;
 const radius = 50;
+const maxHealth = 100;
 let myPlayer = {
     id: 0,
     x: 500,
     y: 500,
     veloX: 0,
     veloY: 0,
-    canShoot: true
+    canShoot: true,
+    health: maxHealth,
+    radius: radius
 }
 
 let crosshair = {
@@ -198,7 +200,6 @@ function renderEntity(x, y, sprite) {
     ctx.drawImage(sprite, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
 }
 
-
 function renderGame() {
     // clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -215,12 +216,10 @@ function renderGame() {
     });
 }
 
-
 function gameLoop() {
     updateGame();
     renderGame();
     requestAnimationFrame(gameLoop);
 }
-
 
 gameLoop();

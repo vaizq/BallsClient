@@ -1,4 +1,4 @@
-const socket = new WebSocket('ws://134.209.230.10:6969');
+const socket = new WebSocket('ws://0.0.0.0:6969');
 
 
 let myPlayer = {};
@@ -33,7 +33,7 @@ function sendPlayerUpdate() {
 // {type: "action", action: "shot", playerID: 123, x: 0, y: 0, directionX: 69, directionY: 420}
 //
 export function netSendAction(action) {
-    action['type'] = 'action';
+    action['type'] = 'Action';
     socket.send(JSON.stringify(action));
 }
 
@@ -52,8 +52,11 @@ function handleWorldUpdate(msg) {
     enemies.clear();
 
     msg['players'].forEach(player => {
-       if (player['id'] != myPlayer.id) {
+        if (player['id'] != myPlayer.id) {
             enemies.set(player['id'], player);
+        }
+        else {
+            myPlayer = player;
         }
     });
     updateTime = Date.now();
