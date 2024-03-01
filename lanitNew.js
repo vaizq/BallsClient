@@ -5,6 +5,7 @@ const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 const playerSprite = document.getElementById("player-avatar");
 const enemySprite = document.getElementById("enemy-avatar");
+const playerScope = document.getElementById("scope");
 
 
 function keyDownHandler(event) {
@@ -44,26 +45,21 @@ function keyUpHandler(event) {
     }
 }
 
+canvas.style.cursor = "none";
+
+let mouseX = 0;
+let mouseY = 0;
+
 
 function mouseMoveHandler(event) {
-    /*
-    const rect = canvas.getBoundingClientRect();
-    let mouseX = event.clientX - rect.left - elementWidth / 2;
-    let mouseY = event.clientY - rect.top - elementHeight / 2;
-    */
-}
-
-function mouseDownHandler(event) {
-    if (event.key === 0) {
-        
-    }
+    mouseX = event.clientX;
+    mouseY = event.clientY;
 }
 
 
 document.addEventListener("keydown", keyDownHandler);
 document.addEventListener("keyup", keyUpHandler);
 document.addEventListener("mousemove", mouseMoveHandler);
-document.addEventListener("mousedown", mouseDownHandler);
 
 
 let aIsPressed = false;
@@ -73,7 +69,7 @@ let wIsPressed = false;
 
 
 let speed = 100;
-const radius = 100;
+const radius = 200;
 let myPlayer = {
     id: 0,
     x: 500,
@@ -110,7 +106,6 @@ function updateVelocity(dt) {
 
     myPlayer.x += myPlayer.veloX * dt;
     myPlayer.y += myPlayer.veloY * dt;
-
 }
 
 function handleCollisions(entity) {
@@ -152,9 +147,15 @@ function drawCircle(x, y, r) {
     ctx.stroke();
 }
 
+
 function renderEntity(x, y, sprite) {
     drawCircle(x, y, radius);
     ctx.drawImage(sprite, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
+}
+
+
+function renderScope(mouseX, mouseY, scope) {
+    ctx.drawImage(scope, mouseX, mouseY);
 }
 
 
@@ -172,6 +173,8 @@ function renderGame() {
         const y = enemy['y'] + enemy['veloY'] * dt;
         renderEntity(x, y, enemySprite);
     });
+
+    renderScope(mouseX, mouseY, playerScope);
 }
 
 
