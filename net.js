@@ -1,4 +1,4 @@
-const socket = new WebSocket('ws://134.209.230.10:6969');
+const socket = new WebSocket('ws://0.0.0.0:6969');
 
 
 let myPlayer = {};
@@ -23,12 +23,17 @@ export function netDeltaTimeFromLastUpdate() {
 }
 
 function sendPlayerUpdate() {
-    console.log("Send player update");
-    socket.send(JSON.stringify(myPlayer));
+    let str = JSON.stringify(myPlayer);
+    let msg = JSON.parse(str);
+    msg['type'] = 'PlayerUpdate';
+    socket.send(JSON.stringify(msg));
 }
 
-// Send actions to server such as {type: "action", action: "shoot", x: 0, y: 0, veloX: 1, veloY: 1}
-function sendAction(action) {
+// Send actions to server such as 
+// {type: "action", action: "shot", playerID: 123, x: 0, y: 0, directionX: 69, directionY: 420}
+//
+export function netSendAction(action) {
+    action['type'] = 'Action';
     socket.send(JSON.stringify(action));
 }
 
@@ -47,8 +52,11 @@ function handleWorldUpdate(msg) {
     enemies.clear();
 
     msg['players'].forEach(player => {
-       if (player['id'] != myPlayer.id) {
+        if (player['id'] != myPlayer.id) {
             enemies.set(player['id'], player);
+        }
+        else {
+            myPlayer = player;
         }
     });
     updateTime = Date.now();
@@ -59,8 +67,6 @@ socket.addEventListener('open', (event) => {
 });
 
 socket.addEventListener('message', (event) => {
-
-    console.log(`Got message: ${event.data}`);
 
     try {
         const msg = JSON.parse(event.data);
