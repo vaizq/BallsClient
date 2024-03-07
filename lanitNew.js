@@ -66,8 +66,8 @@ canvas.style.cursor = "none";
 
 
 function mouseMoveHandler(event) {
-    crosshair.x = event.clientX;
-    crosshair.y = event.clientY;
+    crosshair.x = event.offsetX;
+    crosshair.y = event.offsetY;
 }
 
 function mouseDownHandler(event) {
@@ -77,8 +77,8 @@ function mouseDownHandler(event) {
 
 document.addEventListener("keydown", keyDownHandler);
 document.addEventListener("keyup", keyUpHandler);
-document.addEventListener("mousemove", mouseMoveHandler);
-document.addEventListener("mousedown", mouseDownHandler);
+canvas.addEventListener("mousemove", mouseMoveHandler);
+canvas.addEventListener("mousedown", mouseDownHandler);
 
 
 let aIsPressed = false;
@@ -159,6 +159,13 @@ function updateVelocity(dt) {
     myPlayer.y += myPlayer.veloY * dt;
 }
 
+function updateEnemies(dt) {
+    netGetEnemies().forEach((enemy, key) => {
+        enemy['x'] += enemy['veloX'] * dt;
+        enemy['y'] += enemy['veloY'] * dt;
+    });
+}
+
 function handleCollisions(entity) {
     //added bounds.
     if (entity.x - radius < 0) {
@@ -176,41 +183,48 @@ function handleCollisions(entity) {
     if (entity.y + radius > canvas.height) {
         entity.y = canvas.height - radius;
     }
-
-   
 }
 
 function updateGame() {
     const dt = 1.0 / 60; // deltaTime: Time how long each frame takes in secods 
 
     updateVelocity(dt);
+    updateEnemies(dt);
 
     handleCollisions(myPlayer);
 
     netSetMyPlayer(myPlayer);
 }
 
-/*function drawCircle(x, y, r) {
+
+function drawCircle(x, y, r) {
     ctx.beginPath();
     ctx.arc(x, y, r, 0, 2 * Math.PI, false);
     ctx.fillStyle = "red";
     ctx.lineWidth = 2;
     ctx.strokeStyle = 'red';
     ctx.stroke();
-}*/
+}
 
 
-function renderEntity(x, y, sprite) {
-    ctx.drawImage(sprite, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
+function renderEntity(x, y, sprite, reflected = false) {
+    if (reflected) {
+        ctx.scale(-1, 1);
+        ctx.drawImage(sprite, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
+        ctx.scale(1, 1);
+    }
+    else {
+        ctx.drawImage(sprite, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
+    }
 }
 
 
 function renderScope(x, y, scope, width, height) {
-
+/*
     x = Math.max(0, Math.min(canvas.width - width, x));
     y = Math.max(0, Math.min(canvas.height - height, y));
-
-    ctx.drawImage(scope, x, y, width, height);
+*/
+    ctx.drawImage(scope, x - width / 2, y - height / 2, width, height);
 }
 
 
@@ -218,15 +232,14 @@ function renderGame() {
     // clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // render player
-    renderEntity(myPlayer.x, myPlayer.y, playerSprite);
+    
+    let reflect = () => { return false; };
+    renderEntity(myPlayer.x, myPlayer.y, playerSprite, reflect());
 
     // render enemies
     netGetEnemies().forEach((enemy, key) => {
-        const dt = netDeltaTimeFromLastUpdate();
-        const x = enemy['x'] + enemy['veloX'] * dt;
-        const y = enemy['y'] + enemy['veloY'] * dt;
-        renderEntity(x, y, enemySprite);
+        let reflect = () => { return false; }
+        renderEntity(enemy['x'], enemy['y'], enemySprite, reflect());
     });
 
     renderScope(crosshair.x, crosshair.y, playerScope, 60, 60);

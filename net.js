@@ -52,11 +52,11 @@ function handleWorldUpdate(msg) {
     enemies.clear();
 
     msg['players'].forEach(player => {
-        if (player['id'] != myPlayer.id) {
-            enemies.set(player['id'], player);
+        if (player['id'] == myPlayer.id) {
+            myPlayer = player;
         }
         else {
-            myPlayer = player;
+            enemies.set(player['id'], player);
         }
     });
     updateTime = Date.now();
