@@ -64,13 +64,10 @@ function keyUpHandler(event) {
 
 canvas.style.cursor = "none";
 
-let mouseX = 0;
-let mouseY = 0;
-
 
 function mouseMoveHandler(event) {
-    mouseX = event.clientX;
-    mouseY = event.clientY;
+    crosshair.x = event.clientX;
+    crosshair.y = event.clientY;
 }
 
 function mouseDownHandler(event) {
@@ -81,6 +78,7 @@ function mouseDownHandler(event) {
 document.addEventListener("keydown", keyDownHandler);
 document.addEventListener("keyup", keyUpHandler);
 document.addEventListener("mousemove", mouseMoveHandler);
+document.addEventListener("mousedown", mouseDownHandler);
 
 
 let aIsPressed = false;
@@ -89,8 +87,8 @@ let dIsPressed = false;
 let wIsPressed = false;
 
 
-let speed = 100;
-const radius = 50;
+let speed = 200;
+const radius = 43;
 const maxHealth = 100;
 let myPlayer = {
     id: 0,
@@ -104,8 +102,8 @@ let myPlayer = {
 }
 
 let crosshair = {
-    x: 0,
-    y: 0
+    x: 950,
+    y: 500
 }
 
 const imgWidth = 250;
@@ -120,6 +118,7 @@ function shoot() {
         .then(() => playAudio(shotgunReloadAudio))
         .then(() => {
             myPlayer.canShoot = true;
+            console.log("Audio has been played!");
         });
 
         const shotAction = {
@@ -177,6 +176,8 @@ function handleCollisions(entity) {
     if (entity.y + radius > canvas.height) {
         entity.y = canvas.height - radius;
     }
+
+   
 }
 
 function updateGame() {
@@ -189,24 +190,27 @@ function updateGame() {
     netSetMyPlayer(myPlayer);
 }
 
-function drawCircle(x, y, r) {
+/*function drawCircle(x, y, r) {
     ctx.beginPath();
     ctx.arc(x, y, r, 0, 2 * Math.PI, false);
     ctx.fillStyle = "red";
     ctx.lineWidth = 2;
     ctx.strokeStyle = 'red';
     ctx.stroke();
-}
+}*/
 
 
 function renderEntity(x, y, sprite) {
-    drawCircle(x, y, radius);
     ctx.drawImage(sprite, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
 }
 
 
-function renderScope(mouseX, mouseY, scope) {
-    ctx.drawImage(scope, mouseX, mouseY);
+function renderScope(x, y, scope, width, height) {
+
+    x = Math.max(0, Math.min(canvas.width - width, x));
+    y = Math.max(0, Math.min(canvas.height - height, y));
+
+    ctx.drawImage(scope, x, y, width, height);
 }
 
 
@@ -225,7 +229,7 @@ function renderGame() {
         renderEntity(x, y, enemySprite);
     });
 
-    renderScope(mouseX, mouseY, playerScope);
+    renderScope(crosshair.x, crosshair.y, playerScope, 60, 60);
 }
 
 function gameLoop() {
