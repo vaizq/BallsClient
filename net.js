@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 const socket = new WebSocket('ws://192.168.0.18:6969');
-=======
-const socket = new WebSocket('ws://134.209.230.10:6969');
->>>>>>> 76b7faa1b5ac5539411bc65049c32149035565a8
 
 
 let myPlayer = {};
@@ -56,11 +52,11 @@ function handleWorldUpdate(msg) {
     enemies.clear();
 
     msg['players'].forEach(player => {
-        if (player['id'] != myPlayer.id) {
-            enemies.set(player['id'], player);
+        if (player['id'] == myPlayer.id) {
+            myPlayer = player;
         }
         else {
-            myPlayer = player;
+            enemies.set(player['id'], player);
         }
     });
     updateTime = Date.now();
