@@ -5,9 +5,7 @@ const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 const playerSprite = document.getElementById("player-avatar");
 const enemySprite = document.getElementById("enemy-avatar");
-<<<<<<< HEAD
 const playerScope = document.getElementById("scope");
-=======
 const shotgunBlastAudio = new Audio('shotgun-blast-cut.mp3');
 const shotgunReloadAudio = new Audio('shotgun-reload.mp3');
 
@@ -25,7 +23,6 @@ function playAudio(audio) {
         audio.play();
       });
 }
->>>>>>> d6d30ee2f6efcc8622336e970570309beca5e273
 
 
 function keyDownHandler(event) {
@@ -65,34 +62,23 @@ function keyUpHandler(event) {
     }
 }
 
-<<<<<<< HEAD
 canvas.style.cursor = "none";
 
-let mouseX = 0;
-let mouseY = 0;
-
 
 function mouseMoveHandler(event) {
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-=======
-function mouseMoveHandler(event) {
-    /*
-    const rect = canvas.getBoundingClientRect();
-    let mouseX = event.clientX - rect.left - elementWidth / 2;
-    let mouseY = event.clientY - rect.top - elementHeight / 2;
-    */
+    crosshair.x = event.clientX;
+    crosshair.y = event.clientY;
 }
 
 function mouseDownHandler(event) {
     console.log("Shoot!");
     shoot();        
->>>>>>> d6d30ee2f6efcc8622336e970570309beca5e273
 }
 
 document.addEventListener("keydown", keyDownHandler);
 document.addEventListener("keyup", keyUpHandler);
 document.addEventListener("mousemove", mouseMoveHandler);
+document.addEventListener("mousedown", mouseDownHandler);
 
 
 let aIsPressed = false;
@@ -101,13 +87,9 @@ let dIsPressed = false;
 let wIsPressed = false;
 
 
-let speed = 100;
-<<<<<<< HEAD
-const radius = 200;
-=======
-const radius = 50;
+let speed = 200;
+const radius = 43;
 const maxHealth = 100;
->>>>>>> d6d30ee2f6efcc8622336e970570309beca5e273
 let myPlayer = {
     id: 0,
     x: 500,
@@ -120,8 +102,8 @@ let myPlayer = {
 }
 
 let crosshair = {
-    x: 0,
-    y: 0
+    x: 950,
+    y: 500
 }
 
 const imgWidth = 250;
@@ -136,6 +118,7 @@ function shoot() {
         .then(() => playAudio(shotgunReloadAudio))
         .then(() => {
             myPlayer.canShoot = true;
+            console.log("Audio has been played!");
         });
 
         const shotAction = {
@@ -193,6 +176,8 @@ function handleCollisions(entity) {
     if (entity.y + radius > canvas.height) {
         entity.y = canvas.height - radius;
     }
+
+   
 }
 
 function updateGame() {
@@ -205,30 +190,30 @@ function updateGame() {
     netSetMyPlayer(myPlayer);
 }
 
-function drawCircle(x, y, r) {
+/*function drawCircle(x, y, r) {
     ctx.beginPath();
     ctx.arc(x, y, r, 0, 2 * Math.PI, false);
     ctx.fillStyle = "red";
     ctx.lineWidth = 2;
     ctx.strokeStyle = 'red';
     ctx.stroke();
-}
+}*/
 
 
 function renderEntity(x, y, sprite) {
-    drawCircle(x, y, radius);
     ctx.drawImage(sprite, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
 }
 
-<<<<<<< HEAD
 
-function renderScope(mouseX, mouseY, scope) {
-    ctx.drawImage(scope, mouseX, mouseY);
+function renderScope(x, y, scope, width, height) {
+
+    x = Math.max(0, Math.min(canvas.width - width, x));
+    y = Math.max(0, Math.min(canvas.height - height, y));
+
+    ctx.drawImage(scope, x, y, width, height);
 }
 
 
-=======
->>>>>>> d6d30ee2f6efcc8622336e970570309beca5e273
 function renderGame() {
     // clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -244,7 +229,7 @@ function renderGame() {
         renderEntity(x, y, enemySprite);
     });
 
-    renderScope(mouseX, mouseY, playerScope);
+    renderScope(crosshair.x, crosshair.y, playerScope, 60, 60);
 }
 
 function gameLoop() {
