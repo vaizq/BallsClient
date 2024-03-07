@@ -8,7 +8,15 @@ let updateTime = Date.now();
 
 
 export function netSetMyPlayer(player) {
-    myPlayer = player;
+    myPlayer.x = player.x;
+    myPlayer.y = player.y;
+    myPlayer.veloX = player.veloX;
+    myPlayer.veloY = player.veloY;
+    myPlayer.canShoot = player.canShoot;
+}
+
+export function netGetMyPlayer() {
+    return myPlayer;
 }
 
 export function netGetEnemies() {
@@ -43,6 +51,8 @@ function handleInfoMessage(msg) {
     myPlayer.y = msg['y'];
     myPlayer.veloX = msg['veloX'];
     myPlayer.veloY = msg['veloY'];
+    myPlayer.radius = msg['radius'];
+    myPlayer.health = msg['health'];
 
     // Start sending playerUpdates
     timerID = setInterval(sendPlayerUpdate, 20);
@@ -53,7 +63,7 @@ function handleWorldUpdate(msg) {
 
     msg['players'].forEach(player => {
         if (player['id'] == myPlayer.id) {
-            myPlayer = player;
+            myPlayer = JSON.parse(JSON.stringify(player));
         }
         else {
             enemies.set(player['id'], player);

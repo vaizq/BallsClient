@@ -1,4 +1,4 @@
-import { netGetEnemies, netSetMyPlayer, netDeltaTimeFromLastUpdate, netSendAction} from "./net.js";
+import { netGetEnemies, netSetMyPlayer, netGetMyPlayer, netSendAction} from "./net.js";
 
 
 const canvas = document.getElementById("canvas1");
@@ -8,6 +8,11 @@ const enemySprite = document.getElementById("enemy-avatar");
 const playerScope = document.getElementById("scope");
 const shotgunBlastAudio = new Audio('shotgun-blast-cut.mp3');
 const shotgunReloadAudio = new Audio('shotgun-reload.mp3');
+const beBackAudio = new Audio('t1_be_back.wav');
+const fuckYouAudio = new Audio('t1_fu.wav');
+const hastaLaVistaAudio = new Audio('t2_hasta_la_vista.wav');
+const iamTerminatorAudio = new Audio('t2_terminator.wav');
+const speakAudioList = [fuckYouAudio, hastaLaVistaAudio, iamTerminatorAudio];
 
 
 function playAudio(audio) {
@@ -98,7 +103,10 @@ let myPlayer = {
     veloY: 0,
     canShoot: true,
     health: maxHealth,
-    radius: radius
+    radius: radius,
+    kills: 0,
+    deaths: 0,
+    isDying: false
 }
 
 let crosshair = {
@@ -159,6 +167,27 @@ function updateVelocity(dt) {
     myPlayer.y += myPlayer.veloY * dt;
 }
 
+let prevDeaths = myPlayer.deaths;
+
+function playerIsDead() {
+    if (myPlayer.deaths > prevDeaths) {
+        prevDeaths = myPlayer.deaths;
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+function updatePlayer(dt) {
+    updateVelocity(dt);
+
+    if (playerIsDead()) {
+        // Player died
+        playAudio(beBackAudio);
+    }
+}
+
 function updateEnemies(dt) {
     netGetEnemies().forEach((enemy, key) => {
         enemy['x'] += enemy['veloX'] * dt;
@@ -189,11 +218,18 @@ function updateGame() {
     const dt = 1.0 / 60; // deltaTime: Time how long each frame takes in secods 
 
     updateVelocity(dt);
+    updatePlayer(dt);
     updateEnemies(dt);
 
     handleCollisions(myPlayer);
 
     netSetMyPlayer(myPlayer);
+    myPlayer.id = netGetMyPlayer().id;
+    myPlayer.health = netGetMyPlayer().health;
+    myPlayer.radius = netGetMyPlayer().radius;
+    myPlayer.kills = netGetMyPlayer().kills;
+    myPlayer.deaths = netGetMyPlayer().deaths;
+
 }
 
 
@@ -228,24 +264,44 @@ function renderScope(x, y, scope, width, height) {
 }
 
 
+function renderHealthBar(x, y, health) {
+    const width = health;
+    const height = 10;
+    ctx.fillStyle = "#FF0000";  // Fill color (red in this example)
+    ctx.fillRect(x, y, width, height);
+}
+
+function renderStats() {
+    ctx.font = "20px Arial";   // Font size and family
+    ctx.fillStyle = "#FF0000";  // Fill color (red in this example)
+    const statsText = "Kills: " + myPlayer.kills + " Deaths: " + myPlayer.deaths + " KD: " + (myPlayer.kills / myPlayer.deaths);
+    ctx.fillText(statsText, 30, 30);
+}
+
+
 function renderGame() {
     // clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    
-    let reflect = () => { return false; };
-    renderEntity(myPlayer.x, myPlayer.y, playerSprite, reflect());
 
     // render enemies
     netGetEnemies().forEach((enemy, key) => {
         let reflect = () => { return false; }
         renderEntity(enemy['x'], enemy['y'], enemySprite, reflect());
+        renderHealthBar(enemy['x'] - 50, enemy['y'] - 70, enemy.health);
     });
 
+    
+    let reflect = () => { return false; };
+    renderEntity(myPlayer.x, myPlayer.y, playerSprite, reflect());
+    renderHealthBar(myPlayer.x - 50, myPlayer.y - 70, myPlayer.health);
+
     renderScope(crosshair.x, crosshair.y, playerScope, 60, 60);
+
+    renderStats();
 }
 
 function gameLoop() {
+    console.log(JSON.stringify(myPlayer));
     updateGame();
     renderGame();
     requestAnimationFrame(gameLoop);
