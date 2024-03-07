@@ -1,4 +1,4 @@
-const socket = new WebSocket('ws://134.209.230.10:6969');
+const socket = new WebSocket('ws://192.168.0.18:6969');
 
 
 let myPlayer = {};

@@ -106,8 +106,8 @@ let crosshair = {
     y: 500
 }
 
-const imgWidth = 250;
-const imgHeight = 250;
+const imgWidth = 100;
+const imgHeight = 100;
 
 
 function shoot() {
