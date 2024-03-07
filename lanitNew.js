@@ -117,6 +117,15 @@ let crosshair = {
 const imgWidth = 100;
 const imgHeight = 100;
 
+let lineIndex = 0;
+function sayLine()
+{
+    playAudio(speakAudioList[lineIndex]);
+    lineIndex = (lineIndex + 1) % speakAudioList.length;
+}
+
+let timerID = setInterval(sayLine, 5000);
+
 
 function shoot() {
     if (myPlayer.canShoot) {
@@ -167,8 +176,8 @@ function updateVelocity(dt) {
     myPlayer.y += myPlayer.veloY * dt;
 }
 
-let prevDeaths = myPlayer.deaths;
 
+let prevDeaths = myPlayer.deaths;
 function playerIsDead() {
     if (myPlayer.deaths > prevDeaths) {
         prevDeaths = myPlayer.deaths;
